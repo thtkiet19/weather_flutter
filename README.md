@@ -1,16 +1,11 @@
 # weather_midterm
 
-A new Flutter project for midterm from Ta Huynh Tuan Kiet 19125055
+Ta Huynh Tuan Kiet
 
-## Getting Started
+A new Flutter project using data from https://openweathermap.org/api
 
-This project is a starting point for a Flutter application.
+![z2634752374713_e9e809620c0449e75ba66991f36473a7](https://user-images.githubusercontent.com/63939319/126794223-7c8e2e40-c8c3-460c-9d90-8a23e35f2671.jpg)
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Suggestion using flutter_typeahead
+![z2634752384066_c00d6b921481519d518011a6b439023a](https://user-images.githubusercontent.com/63939319/126794285-b74c926e-de78-491b-8262-182e385b0b6b.jpg)
+![z2634746354052_3f764a099bae80805f96b7ec85d38082](https://user-images.githubusercontent.com/63939319/126794300-de9627af-b742-4cd1-95d4-d0b02cdc017f.jpg)
