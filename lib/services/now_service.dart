@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:weather_midterm/models.dart';
+import 'package:weather_midterm/models/now_models.dart';
 import 'package:http/http.dart' as http;
 
 class DataService {
-  Future<WeatherResponse> getWeather(String city) async {
+  Future<WeatherResponse> getWeatherNow(String city) async {
     final queryParameters = {
       'q': city,
       'appid': '3aa6b9af54a1fdb532fdfbbdb85b11ca',
@@ -19,6 +19,7 @@ class DataService {
     print(response.body);
     final json = jsonDecode(response.body);
     print('object json updated');
+
     return WeatherResponse.fromJson(json);
   }
 }

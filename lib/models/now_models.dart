@@ -70,6 +70,19 @@ class TemperatureInfo {
   }
 }
 
+class GeoInfo {
+  final double lat;
+  final double lon;
+
+  GeoInfo({required this.lat, required this.lon});
+
+  factory GeoInfo.fromJson(Map<String, dynamic> json) {
+    final lon = json['lon'];
+    final lat = json['lat'];
+    return GeoInfo(lat: lat, lon: lon);
+  }
+}
+
 class CountryInfo {
   final String contryCode;
 
@@ -88,6 +101,7 @@ class WeatherResponse {
   final String time;
   final CountryInfo country;
   final DateTime now;
+  final GeoInfo geo;
 
   String get iconUrl {
     return 'assets/images/${weatherInfo.icon}.png';
@@ -99,7 +113,8 @@ class WeatherResponse {
       required this.weatherInfo,
       required this.time,
       required this.country,
-      required this.now});
+      required this.now,
+      required this.geo});
 
   factory WeatherResponse.fromJson(Map<String, dynamic> json) {
     final cityName = json['name'];
@@ -114,10 +129,13 @@ class WeatherResponse {
     final cntryInfo = json['sys'];
     final contry = CountryInfo.fromJson(cntryInfo);
     final int offset = json['timezone'];
-    print('get time offset${offset}');
+    print('get time offset$offset');
     DateTime now = DateTime.now().toUtc();
     now = now.add(Duration(seconds: offset));
     print('get time final');
+
+    final geoInfo = json['coord'];
+    final geo = GeoInfo.fromJson(geoInfo);
 
     String time = DateFormat.jm().format(now);
     print('get time format');
@@ -128,6 +146,7 @@ class WeatherResponse {
         weatherInfo: weatherInfo,
         time: time,
         country: contry,
-        now: now);
+        now: now,
+        geo: geo);
   }
 }

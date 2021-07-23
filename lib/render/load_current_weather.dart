@@ -2,24 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'animatedImage.dart';
-import 'models.dart';
+import '../models/now_models.dart';
 import 'package:bordered_text/bordered_text.dart';
 
-class refreshWeather extends StatefulWidget {
+class LoadCurrentWeather extends StatefulWidget {
   final WeatherResponse? response;
   final String countryName;
   final Color tempcolor;
-  refreshWeather(
+  LoadCurrentWeather(
       {Key? key,
       required this.response,
       required this.countryName,
       required this.tempcolor})
       : super(key: key);
   @override
-  _refreshWeatherState createState() => _refreshWeatherState();
+  _LoadCurrentWeatherState createState() => _LoadCurrentWeatherState();
 }
 
-class _refreshWeatherState extends State<refreshWeather> {
+class _LoadCurrentWeatherState extends State<LoadCurrentWeather> {
   var sd = [
     Shadow(
         // bottomLeft
@@ -57,15 +57,6 @@ class _refreshWeatherState extends State<refreshWeather> {
           children: [
             Column(
               children: [
-                AnimatedImage(
-                  response: widget.response,
-                  key: widget.key,
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                //Text('${widget.response!.iconUrl}'),
-                //Image.network(_response!.iconUrl),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -74,7 +65,7 @@ class _refreshWeatherState extends State<refreshWeather> {
                       child: Text(
                         '${widget.response!.cityName}',
                         style: TextStyle(
-                            fontSize: 30,
+                            fontSize: 28,
                             letterSpacing: 4,
                             fontWeight: FontWeight.w900,
                             color: Colors.white),
@@ -86,10 +77,10 @@ class _refreshWeatherState extends State<refreshWeather> {
                     Container(
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white)),
+                          border: Border.all(color: Colors.white, width: 2)),
                       child: CircleAvatar(
                           backgroundColor: Colors.white70,
-                          radius: 17,
+                          radius: 14,
                           backgroundImage: AssetImage(
                               'assets/images/country/${widget.countryName}.png')),
                     )
@@ -98,46 +89,6 @@ class _refreshWeatherState extends State<refreshWeather> {
                 SizedBox(
                   height: 10,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    BorderedText(
-                      strokeWidth: 2.0,
-                      strokeColor: Colors.black87,
-                      child: Text(
-                        '${widget.response!.tempInfo.temperature}°C',
-                        style: GoogleFonts.openSans(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Material(
-                      color: Colors.white70,
-                      shape: CircleBorder(
-                        side: BorderSide(color: widget.tempcolor, width: 2.0),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Icon(
-                          Icons.thermostat_outlined,
-                          color: widget.tempcolor,
-                          size: 30.0,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  widget.response!.weatherInfo.description,
-                  style: GoogleFonts.rockSalt(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600),
-                ),
                 BorderedText(
                   strokeWidth: 2.0,
                   strokeColor: Colors.black87,
@@ -145,13 +96,38 @@ class _refreshWeatherState extends State<refreshWeather> {
                     '${widget.response!.time}',
                     style: GoogleFonts.openSans(
                         color: Colors.white,
-                        fontSize: 28,
+                        fontSize: 23,
                         fontWeight: FontWeight.w700),
                   ),
                 ),
                 SizedBox(
                   height: 5,
-                )
+                ),
+                AnimatedImage(
+                  response: widget.response,
+                  key: widget.key,
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                BorderedText(
+                  strokeWidth: 2.0,
+                  strokeColor: Colors.black87,
+                  child: Text(
+                    '${widget.response!.tempInfo.temperature}°C',
+                    style: GoogleFonts.openSans(
+                        color: Colors.white,
+                        fontSize: 40,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ),
+                Text(
+                  widget.response!.weatherInfo.description,
+                  style: GoogleFonts.openSans(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w600),
+                ),
               ],
             ),
           ],

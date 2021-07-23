@@ -1,11 +1,15 @@
 import 'dart:convert';
-
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:weather_midterm/service.dart';
+import 'package:weather_midterm/models/daily_models.dart';
+import 'package:weather_midterm/services/city_data.dart';
+import 'package:weather_midterm/services/now_service.dart';
+import 'package:weather_midterm/services/daily_service.dart';
 import 'package:flutter/material.dart';
-import 'refresh weather.dart';
-import 'models.dart';
+import 'render/load_current_weather.dart';
+import 'render/load_daily_weather.dart';
+import 'models/now_models.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,10 +21,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _cityTextController = TextEditingController();
   final _dataService = DataService();
+  final _dailyDataService = DailyService();
 
   WeatherResponse? _response;
+  DailyWeather? _daily_response;
   late String coName;
 
   Color purple = Color(0xff6300B4);
@@ -46,8 +51,8 @@ class _MyAppState extends State<MyApp> {
   ], begin: Alignment.topCenter, end: Alignment.bottomCenter);
 
   var daybackgroundGradient = LinearGradient(colors: [
-    Color.fromRGBO(5, 196, 211, 1),
-    Color.fromRGBO(4, 120, 213, 1),
+    Color.fromRGBO(161, 223, 254, 1),
+    Color.fromRGBO(161, 223, 254, 1),
   ], begin: Alignment.topCenter, end: Alignment.bottomCenter);
 
   var backgroundGradient = LinearGradient(colors: [
@@ -57,6 +62,10 @@ class _MyAppState extends State<MyApp> {
 
   List<String> _code = [];
   List<String> _country = [];
+  List<String> citiesdata = [];
+
+  final TextEditingController _typeAheadController = TextEditingController();
+  String? _selectedCity;
 
   bool isDayTime = true;
 
@@ -80,6 +89,16 @@ class _MyAppState extends State<MyApp> {
     return codes;
   }
 
+  Future<List<String>> _loadCities() async {
+    List<String> locations = [];
+    await rootBundle.loadString('assets/cities.txt').then((q) {
+      for (String i in LineSplitter().convert(q)) {
+        locations.add(i);
+      }
+    });
+    return locations;
+  }
+
   void initState() {
     _setup();
     super.initState();
@@ -88,10 +107,12 @@ class _MyAppState extends State<MyApp> {
   _setup() async {
     List<String> location = await _loadLocations();
     List<String> code = await _loadCodes();
+    List<String> cities = await _loadCities();
 
     setState(() {
       _country = location;
       _code = code;
+      citiesdata = cities;
     });
   }
 
@@ -109,28 +130,34 @@ class _MyAppState extends State<MyApp> {
                 padding: EdgeInsets.symmetric(vertical: 50),
                 child: SizedBox(
                   width: 250,
-                  child: TextField(
-                      controller: _cityTextController,
-                      decoration: InputDecoration(
-                        floatingLabelBehavior: FloatingLabelBehavior.never,
-                        fillColor: veryLightPurple,
-                        prefixIcon: Icon(Icons.location_city_outlined),
-                        border: OutlineInputBorder(),
-                        labelText: 'City name',
-                      ),
-                      textAlign: TextAlign.center),
+                  child: TypeAheadFormField(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      decoration: InputDecoration(labelText: 'City'),
+                      controller: this._typeAheadController,
+                    ),
+                    suggestionsCallback: (pattern) {
+                      return CitiesService.getSuggestions(pattern, citiesdata);
+                    },
+                    itemBuilder: (context, String suggestion) {
+                      return ListTile(
+                        title: Text(suggestion),
+                      );
+                    },
+                    transitionBuilder: (context, suggestionsBox, controller) {
+                      return suggestionsBox;
+                    },
+                    onSuggestionSelected: (String suggestion) {
+                      this._typeAheadController.text = suggestion;
+                    },
+                    validator: (value) =>
+                        value!.isEmpty ? 'Please select a city' : null,
+                    onSaved: (value) => this._selectedCity = value,
+                  ),
                 ),
               ),
               IconButton(
                   onPressed: () async {
-                    setState(() {
-                      _search();
-                      refreshWeather(
-                        response: _response,
-                        countryName: coName,
-                        tempcolor: tempcolor,
-                      );
-                    });
+                    setState(() => _search());
                   },
                   icon: Icon(Icons.search)),
             ]),
@@ -142,11 +169,12 @@ class _MyAppState extends State<MyApp> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      refreshWeather(
+                      LoadCurrentWeather(
                         response: _response,
                         countryName: coName,
                         tempcolor: tempcolor,
                       ),
+                      LoadDailyWeather(response: _daily_response)
                     ],
                   ),
                 ),
@@ -158,7 +186,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _search() async {
-    final response = await _dataService.getWeather(_cityTextController.text);
+    final response =
+        await _dataService.getWeatherNow(_typeAheadController.text);
+    final daily_response = await _dailyDataService.getWeatherNow(
+        response.geo.lat, response.geo.lon);
     String? country;
     for (int i = 0; i < 223; i++) {
       if (response.country.contryCode == _code[i]) {
@@ -176,6 +207,7 @@ class _MyAppState extends State<MyApp> {
             : neutral;
     setState(() {
       _response = response;
+      _daily_response = daily_response;
       coName = country!;
       backgroundGradient = isDay;
       tempcolor = color;

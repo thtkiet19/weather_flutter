@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'models.dart';
+import '../models/now_models.dart';
 
 class AnimatedImage extends StatefulWidget {
   final WeatherResponse? response;
